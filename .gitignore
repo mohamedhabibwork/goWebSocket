@@ -54,7 +54,7 @@ _testmain.go
 /misc/cgo/life/run.out
 /misc/cgo/stdio/run.out
 /misc/cgo/testso/main
-/pkg/
+# /pkg/
 /src/*.*/
 /src/cmd/cgo/zdefaultcc.go
 /src/cmd/dist/dist
