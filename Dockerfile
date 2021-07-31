@@ -29,6 +29,15 @@ EXPOSE 8080
 # to the docker command on the command line.
 ENV PORT=8080
 # Run
-#USER root
-#RUN chmod +x *
-CMD [ "/socket" ]
+ARG WWWGROUP
+
+ARG user=appuser
+ARG group=appuser
+ARG uid=1000
+ARG gid=1000
+RUN addgroup -g ${gid} -S ${group} && adduser -u ${uid} -S ${group} -G ${group}
+
+USER "${group}:${user}"
+# RUN chmod a+x socket
+
+ENTRYPOINT ["./socket"]
