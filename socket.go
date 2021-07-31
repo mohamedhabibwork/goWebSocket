@@ -15,10 +15,15 @@ func MessageConn() http.Handler {
 }
 
 func MessagesSocket(response http.ResponseWriter, request *http.Request) {
+	var AppName = request.FormValue("app_name")
 	var channel = request.FormValue("channel")
 
 	if channel == "" {
 		return
+	}
+
+	if AppName == "" {
+		AppName = "Other"
 	}
 
 	upgrader := websocket.Upgrader{
@@ -39,40 +44,29 @@ func MessagesSocket(response http.ResponseWriter, request *http.Request) {
 	var conn, err = upgrader.Upgrade(response, request, nil)
 
 	if err != nil {
-		defer func(conn *websocket.Conn) {
-			err := conn.Close()
-			if err != nil {
-
-			}
-		}(conn)
+		defer conn.Close()
 		return
 	}
 
 	uuid, _ := uuid.NewRandom()
 	connId := uuid.String()
-	addConnToHub(channel, connId, conn)
-	go readData(channel, connId, conn)
+	addConnToHub(AppName, channel, connId, conn)
+	go readData(AppName, channel, connId, conn)
 	for {
 		select {
 		case message := <-MessageChan:
 			for _, connWrite := range hub[message.ToClient] {
 				err := connWrite.WriteJSON(message)
 				if err != nil {
-					removeConnToHub(channel, connId)
-					defer func(conn *websocket.Conn) {
-						err := conn.Close()
-						if err != nil {
-
-						}
-					}(conn)
+					removeConnToHub(AppName, channel, connId)
+					defer conn.Close()
 				}
 			}
-
 		}
 	}
 }
 
-func addConnToHub(channel string, connId string, conn *websocket.Conn) {
+func addConnToHub(AppName string, channel string, connId string, conn *websocket.Conn) {
 	_, ok := hub[channel]
 	if ok {
 		hub[channel][connId] = conn
@@ -83,7 +77,7 @@ func addConnToHub(channel string, connId string, conn *websocket.Conn) {
 	}
 }
 
-func removeConnToHub(channel string, connId string) {
+func removeConnToHub(AppName string, channel string, connId string) {
 	_, ok := hub[channel][connId]
 
 	if ok {
@@ -91,24 +85,20 @@ func removeConnToHub(channel string, connId string) {
 	}
 }
 
-func readData(channel string, connId string, conn *websocket.Conn) {
+func readData(AppName string, channel string, connId string, conn *websocket.Conn) {
 	for {
 		_, _, err := conn.ReadMessage()
 
 		if err != nil {
-			removeConnToHub(channel, connId)
-			defer func(conn *websocket.Conn) {
-				err := conn.Close()
-				if err != nil {
-
-				}
-			}(conn)
+			removeConnToHub(AppName, channel, connId)
+			defer conn.Close()
 			return
 		}
 	}
 }
 
 type Message struct {
+	AppName    string `json:"app_name" `
 	ToClient   string `json:"to_client"`
 	FormClient string `json:"form_client"`
 	Data       string `json:"data"`

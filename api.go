@@ -16,9 +16,20 @@ func sendMessage(response http.ResponseWriter, request *http.Request) {
 
 	if err != nil {
 		print("error decoding body")
+		var ResponseError = struct {
+			Status bool   `json:"status"`
+			Error  string `json:"error"`
+		}{}
+		ResponseError.Status = false
+		ResponseError.Error = "not matched struct Message"
+		messageError, _ := json.Marshal(ResponseError)
+		_, _ = response.Write([]byte(messageError))
 		return
 	}
 
+	if MessageRequest.AppName == "" {
+		MessageRequest.AppName = "Other"
+	}
 	MessageChan <- MessageRequest
 	var Response = struct {
 		Status bool `json:"status"`

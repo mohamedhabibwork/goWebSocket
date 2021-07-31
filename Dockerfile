@@ -4,8 +4,8 @@ RUN mkdir /socket
 ADD . /socket
 WORKDIR /socket
 RUN go clean --modcache
-COPY src/go.mod ./
-COPY src/go.sum ./
+COPY go.mod ./
+COPY go.sum ./
 RUN go mod download
 #RUN CGO_ENABLE=0 GOOS=linux go build -a -installsuffix cgo -o main .
 
