@@ -15,6 +15,7 @@ func main() {
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
+
 	var port = os.Getenv("PORT")
 
 	http.Handle(
