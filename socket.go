@@ -55,10 +55,10 @@ func MessagesSocket(response http.ResponseWriter, request *http.Request) {
 	for {
 		select {
 		case message := <-MessageChan:
-			for _, connWrite :=range hub[message.ToClient]{
-				err:=connWrite.WriteJSON(message)
-				if err!=nil {
-					removeConnToHub(channel,connId)
+			for _, connWrite := range hub[message.ToClient] {
+				err := connWrite.WriteJSON(message)
+				if err != nil {
+					removeConnToHub(channel, connId)
 					defer func(conn *websocket.Conn) {
 						err := conn.Close()
 						if err != nil {

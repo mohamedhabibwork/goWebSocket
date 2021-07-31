@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 )
 
@@ -16,7 +15,7 @@ func sendMessage(response http.ResponseWriter, request *http.Request) {
 	err := dec.Decode(&MessageRequest)
 
 	if err != nil {
-		fmt.Println("error decoding body")
+		print("error decoding body")
 		return
 	}
 
@@ -24,8 +23,11 @@ func sendMessage(response http.ResponseWriter, request *http.Request) {
 	var Response = struct {
 		Status bool `json:"status"`
 	}{}
-	Response.Status=true
-	message,err:=json.Marshal(Response)
+	Response.Status = true
+	message, err := json.Marshal(Response)
 
-	response.Write([]byte(message))
+	_, err = response.Write([]byte(message))
+	if err != nil {
+		return
+	}
 }
