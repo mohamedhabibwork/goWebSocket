@@ -73,3 +73,4 @@ _testmain.go
 /test/times.out
 .vscode
 .idea
+vendor
