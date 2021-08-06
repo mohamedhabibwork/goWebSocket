@@ -15,7 +15,7 @@ services:
     volumes:
       - database_postgres_go:/var/lib/postgres/data
   web:
-    build: .
+    build: ./
     container_name: "go-socket-app"
     environment:
       DB_USERNAME: "postgres"
