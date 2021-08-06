@@ -13,7 +13,7 @@ RUN go mod download
 #RUN apk --no-cache add ca-certificates
 #RUN apk add --no-cache git make musl-dev go
 
-COPY ./*.go ./src
+COPY *.go ./src
 
 # Build
 RUN go build -o /socket
